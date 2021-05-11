@@ -25,11 +25,11 @@ that has the advantage of being **exact** and **non-parametric**. This is the Ho
 
 ## Set up
 
-For now assume that there are $n$ binary random variables $X_i\in\{0,1\}$ with expectation $p$ and the average of these binary random variables, denoted $\hat{p}_n$, is used as an estimate of $p$.
+For now assume that there are $n$ binary random variables $X_i\in\{0,1\}$ with expectation $p$ and the average of these binary random variables, denoted $\hat{p}_n$, is used to estimate $p$.
 
 **Accuracy**
 
-For the accuracy metric the binary random variable $X_i$ indicates if the $i$th example is correctly classified (i.e. 0) or incorrectly classified (i.e. 1). $\hat{p}_n$ is the proportion of correctly classified examples and $p$ is the accuracy of the classifier.
+For the accuracy metric the binary random variable $X_i$ indicates if the $i$th example is correctly classified ($X_i=0$) or incorrectly classified ($X_i=1$). $\hat{p}_n$ is the proportion of correctly classified examples on the test set and $p$ is the accuracy of the classifier.
 
 ## Hoeffding Confidence Interval
 
