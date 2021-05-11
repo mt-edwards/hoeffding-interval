@@ -21,45 +21,56 @@ For classification models there is one confidence interval that can be used for
 - sensitivity
 - specificity 
 
-that has the advantage of being **exact** an **non-parmetric**. This is the Hoeffding Confidence Interval (HCI).
+that has the advantage of being **exact** and **non-parametric**. This is the Hoeffding Confidence Interval.
 
 ## Set up
 
-For now assume that there are $n$ Bernoulli random variables $X_i\sim\text{Bern}(p)$ with expectation $p$ and the average $\overline{X}_n$ is used as an estimate of $p$. 
+For now assume that there are $n$ binary random variables $X_i\in\{0,1\}$ with expectation $p$ and the average of these binary random variables, denoted $\hat{p}_n$, is used as an estimate of $p$.
 
-We would like to be **confident** ($\delta$) that the difference between the expectation and the estimate (i.e. $\vert\overline{X}_n-p\vert$) is within some **error** ($\epsilon$):
+**Accuracy**
 
-$$
-P(\vert\overline{X}_n-p\vert\leq\epsilon)\geq\delta
-$$
+For the accuracy metric the binary random variable $X_i$ indicates if the $i$th example is correctly classified (i.e. 0) or incorrectly classified (i.e. 1). $\hat{p}_n$ is the proportion of correctly classified examples and $p$ is the accuracy of the classifier.
 
-The $\delta$% CI is $[\max\{\overline{X}_n-\epsilon, 0\}, \min\{\overline{X}_n+\epsilon, 1\}]$.
+## Hoeffding Confidence Interval
 
-## Hoeffding 1
-
-Hoeffding takes
+Hoeffding proved that
 
 $$
-P(\vert\overline{X}_n-p\vert\leq\epsilon)\geq\delta
+\hat{p}_n\pm\epsilon
 $$
 
-and provides a relationship between $\epsilon$, $\delta$ and $n$:
+is a $(1-\delta)$% confidence interval with sample size $n$ if
 
 $$
-\epsilon=\sqrt{\frac{\ln(2)-\ln(1-\delta)}{2n}}
+\epsilon=\sqrt{\frac{\ln(2/\delta)}{2n}}.
 $$
 
-so if you want a 95\% HCI (i.e. $\delta=0.95$) with data size $n=100$ you can calculate $\epsilon$ and construct the interval in the previous slide.
+For example, a 95% confidence interval (i.e. $\delta=0.05$) with a sample size of $n=1000$ has an error of approximately 4.29% with confidence interval $\hat{p}_{1000}\pm0.0429$
 
-## Hoeffding 2
+## Bound Issues
 
-You can even rearrange the relationship:
+With small $n$ sometimes $\hat{p}_n-\epsilon<0$ or $\hat{p}_n+\epsilon>1$. In this case we can redefine the upper and lower bounds as
 
 $$
-n=\frac{\ln(2)-\ln(1-\delta)}{2\epsilon^2}
+[\max\{\hat{p}_n-\epsilon, 0\}, \min\{\hat{p}_n+\epsilon, 1\}]
+$$
+and this remains a $(1-\delta)$% confidence interval.
+
+## Power Calculation
+
+Hoeffding also proved that 
+
+$$
+\hat{p}_n\pm\epsilon
 $$
 
-so if you want a 95\% HCI (i.e. $\delta=0.95$) with error $\epsilon=0.01$ you can calculate $n$ to know how much data you will need.
+is a $(1-\delta)$% confidence interval with error $\epsilon$ if 
+
+$$
+n\geq\frac{\ln(2/\delta)}{2\epsilon^2}.
+$$
+
+**This can be used to calculate the test set size.**
 
 ## Application to Metrics
 
@@ -77,14 +88,14 @@ This can all be done with a very simple python function:
 
 ```
 def hoeffding_interval(n, delta, estimate):
-    epsilon = math.sqrt((math.log(2)-math.log(1-delta))/(2*n))
+    epsilon = math.sqrt((math.log(2/delta))/(2*n))
     return (max(estimate-epsilon,0),min(estimate+epsilon,1))
 ```
 
-For example if my estimate $\overline{X}_n=0.8$ then:
+For example if my estimate $\hat{p}_n=0.8$ then:
 
 ```
 >>> import math
->>> hoeffding_interval(100, 0.95, 0.8)
+>>> hoeffding_interval(100, 0.05, 0.8)
 (0.6641898484259381, 0.935810151574062)
 ```
