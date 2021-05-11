@@ -27,7 +27,7 @@ that has the advantage of being **exact** an **non-parmetric**. This is the Hoef
 
 For now assume that there are $n$ Bernoulli random variables $X_i\sim\text{Bern}(p)$ with expectation $p$ and the average $\overline{X}_n$ is used as an estimate of $p$. 
 
-We would like to be **confident** ($\delta$) that the difference between the expectation and the average (i.e. $\vert\overline{X}_n-p\vert$) is within some **error** ($\epsilon$):
+We would like to be **confident** ($\delta$) that the difference between the expectation and the estimate (i.e. $\vert\overline{X}_n-p\vert$) is within some **error** ($\epsilon$):
 
 $$
 P(\vert\overline{X}_n-p\vert\leq\epsilon)\geq\delta
