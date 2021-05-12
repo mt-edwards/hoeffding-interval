@@ -1,5 +1,5 @@
 ---
-title: "Hoeffding Intervals"
+title: "Hoeffding Confidence Intervals"
 author: "Matthew Edwards"
 date: "11/05/2021"
 output: ioslides_presentation
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Introduction
 
-Confidence intervals on metrics are great for understanding how well you have estimated the performance of a model and for understanding if one model is better than another. 
+Confidence intervals for metric estimates are great for understanding how uncertain your estimates are and for understanding if one model is better than another. 
 
 For classification models there is one confidence interval that can be used for 
 
@@ -21,38 +21,63 @@ For classification models there is one confidence interval that can be used for
 - sensitivity
 - specificity 
 
-that has the advantage of being **exact** and **non-parametric**. This is the Hoeffding Confidence Interval.
+that has the advantage of being **exact** and **nonparametric**. This is the Hoeffding Confidence Interval.
+
+## Confidence Interval
+
+An estimate $\hat\theta_n$ of a parameter $\theta$ has a $(1-\delta)$% confidence interval $\hat\theta_n\pm\epsilon$ if with at least $1-\delta$ probability the statement
+
+$$
+\hat\theta_n+\epsilon\leq\theta\leq\hat\theta_n+\epsilon
+$$
+
+is true. The probability is with respect to the estimate $\hat\theta_n$ and the error $\epsilon$.
+
+- **Exact**: statement is exact (e.g. non-asymptotic)
+- **Nonparametric**: statement holds for (almost) all models of $\hat\theta_n$
+
+## Motivation
+
+If you construct a confidence interval and $\epsilon$ is large for a given test set size you know that your estimate is uncertain and should you increase your test set size.
+
+If you construct two confidence intervals for two different models and the confidence intervals do not overlap then you know that one model is *significantly* better than the other. 
 
 ## Set up
 
-For now assume that there are $n$ binary random variables $X_i\in\{0,1\}$ with expectation $p$ and the average of these binary random variables, denoted $\hat{p}_n$, is used to estimate $p$.
+For now assume that there are $n$ binary random variables $X_i\in\{0,1\}$ with expectation $\theta$ and the average of these binary random variables
 
-**Accuracy**
+$$
+\hat{\theta}_n=\frac{1}{n}\sum_{i=1}^n{X_i}
+$$
 
-For the accuracy metric the binary random variable $X_i$ indicates if the $i$th example is correctly classified ($X_i=0$) or incorrectly classified ($X_i=1$). $\hat{p}_n$ is the proportion of correctly classified examples on the test set and $p$ is the accuracy of the classifier.
+is used to estimate $\theta$.
+
+## Example: Accuracy
+
+For the accuracy metric the binary random variable $X_i$ indicates if the $i$th example is correctly classified ($X_i=0$) or incorrectly classified ($X_i=1$). $\hat{\theta}_n$ is the proportion of correctly classified examples on the test set and $\theta$ is the accuracy of the classifier.
 
 ## Hoeffding Confidence Interval
 
 Hoeffding proved that
 
 $$
-\hat{p}_n\pm\epsilon
+\hat{\theta}_n\pm\epsilon
 $$
 
-is a $(1-\delta)$% confidence interval with sample size $n$ if
+is a $(1-\delta)$% confidence interval with test set size of $n$ if
 
 $$
 \epsilon=\sqrt{\frac{\ln(2/\delta)}{2n}}.
 $$
 
-For example, a 95% confidence interval (i.e. $\delta=0.05$) with a sample size of $n=1000$ has an error of approximately 4.29% with confidence interval $\hat{p}_{1000}\pm0.0429$
+For example, a 95% confidence interval (i.e. $\delta=0.05$) with a test set size of $n=1000$ has an error of approximately 4.29% with confidence interval $\hat{\theta}_{1000}\pm0.0429$
 
 ## Bound Issues
 
-With small $n$ sometimes $\hat{p}_n-\epsilon<0$ or $\hat{p}_n+\epsilon>1$. In this case we can redefine the upper and lower bounds as
+With small $n$ sometimes $\hat{\theta}_n-\epsilon<0$ or $\hat{\theta}_n+\epsilon>1$. In this case we can redefine the upper and lower bounds as
 
 $$
-[\max\{\hat{p}_n-\epsilon, 0\}, \min\{\hat{p}_n+\epsilon, 1\}]
+[\max\{\hat{\theta}_n-\epsilon, 0\}, \min\{\hat{\theta}_n+\epsilon, 1\}]
 $$
 and this remains a $(1-\delta)$% confidence interval.
 
@@ -61,7 +86,7 @@ and this remains a $(1-\delta)$% confidence interval.
 Hoeffding also proved that 
 
 $$
-\hat{p}_n\pm\epsilon
+\hat{\theta}_n\pm\epsilon
 $$
 
 is a $(1-\delta)$% confidence interval with error $\epsilon$ if 
@@ -70,7 +95,7 @@ $$
 n\geq\frac{\ln(2/\delta)}{2\epsilon^2}.
 $$
 
-**This can be used to calculate the test set size.**
+**This can be used to calculate the test set size for a given confidence $\delta$ and error $\epsilon$.**
 
 ## Application to Metrics
 
@@ -88,11 +113,11 @@ This can all be done with a very simple python function:
 
 ```
 def hoeffding_interval(n, delta, estimate):
-    epsilon = math.sqrt((math.log(2/delta))/(2*n))
-    return (max(estimate-epsilon,0),min(estimate+epsilon,1))
+    epsilon = math.sqrt((math.log(2 / delta)) / (2 * n))
+    return (max(estimate - epsilon, 0), min(estimate + epsilon, 1))
 ```
 
-For example if my estimate $\hat{p}_n=0.8$ then:
+For example if my estimate $\hat{\theta}_n=0.8$ then:
 
 ```
 >>> import math
