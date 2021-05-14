@@ -7,6 +7,7 @@ output: ioslides_presentation
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
 ```
 
 ## Introduction
@@ -25,7 +26,7 @@ that has the advantage of being **exact** and **nonparametric**. This is the Hoe
 
 ## Confidence Interval
 
-An estimate $\hat\theta_n$ of a parameter $\theta$ has a $(1-\delta)$% confidence interval $\hat\theta_n\pm\epsilon$ if with at least $1-\delta$ probability the statement
+An estimate $\hat\theta_n$ of a parameter $\theta$ (e.g. accuracy) has a $(1-\delta)$% confidence interval $\hat\theta_n\pm\epsilon$ if with at least $1-\delta$ probability the statement
 
 $$
 \hat\theta_n+\epsilon\leq\theta\leq\hat\theta_n+\epsilon
@@ -38,9 +39,23 @@ is true. The probability is with respect to the estimate $\hat\theta_n$ and the 
 
 ## Motivation
 
-If you construct a confidence interval and $\epsilon$ is large for a given test set size you know that your estimate is uncertain and should you increase your test set size.
+If you construct a confidence interval and the error is large for a given test set size you know that your estimate is uncertain and should you increase your test set size.
 
 If you construct two confidence intervals for two different models and the confidence intervals do not overlap then you know that one model is *significantly* better than the other. 
+
+## Visualisation
+
+```{r}
+tibble(model = c("Model 1", "Model 2", "Model 1", "Model 2"), 
+       metric = c(85, 89, 85, 89),
+       lower = c(84, 88, 82, 86),
+       upper = c(86, 90, 88, 92),
+       study = c("Study 1 (error 1%)", "Study 1 (error 1%)", "Study 2 (error 3%)", "Study 2 (error 3%)")) %>% 
+  ggplot() +
+  geom_pointrange(aes(x = model, y = metric, ymin = lower, ymax = upper)) +
+  facet_grid(~study) +
+  labs(x = NULL, y = "Accuracy")
+```
 
 ## Set up
 
