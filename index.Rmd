@@ -29,13 +29,45 @@ that has the advantage of being **exact** and **nonparametric**. This is the Hoe
 An estimate $\hat\theta_n$ of a parameter $\theta$ (e.g. accuracy) has a $(1-\delta)$% confidence interval $\hat\theta_n\pm\epsilon$ if with at least $1-\delta$ probability the statement
 
 $$
-\hat\theta_n+\epsilon\leq\theta\leq\hat\theta_n+\epsilon
+\hat\theta_n-\epsilon\leq\theta\leq\hat\theta_n+\epsilon
 $$
 
 is true. The probability is with respect to the estimate $\hat\theta_n$ and the error $\epsilon$.
 
 - **Exact**: statement is exact (e.g. non-asymptotic)
 - **Nonparametric**: statement holds for (almost) all models of $\hat\theta_n$
+
+## Interpretation 1
+
+Assume we have some model with an unknown true accuracy $\theta$ and 100 independent test sets of size $n$. For each test set $i$ we:
+
+ 1. Estimate the accuracy of the model $\hat\theta_{n,i}$
+ 2. Calculate the error $\epsilon_i$
+ 3. Construct a 99% confidence interval $CI_i = \hat\theta_{n,i}\pm\epsilon_i$
+
+The phrase "99% confidence" means that out of the 100 confidence intervals we should expect at least 99 (which is 99% of the 100) to contain the unknown true accuracy, $\theta\in CI_i$.
+
+## Interpretation 2
+
+Approximately 99% confidence.
+
+```{r}
+set.seed(42)
+delta = 0.5
+n = 1000
+epsilon = sqrt(log(2/delta)/(2*n)) 
+delta_bar = log(2/delta)
+epsilon = (sqrt(delta_bar*(2*delta_bar+n))+delta_bar)/(sqrt(2)*n)
+tibble(test_set = seq_len(100),
+       accuracy = replicate(100, mean(rbinom(n, size = 1, prob = 0.92)))) %>% 
+  mutate(lower = pmax(accuracy - epsilon, 0)) %>% 
+  mutate(upper = pmin(accuracy + epsilon, 1)) %>% 
+  ggplot() +
+  geom_linerange(aes(x = test_set, y = accuracy, ymin = lower, ymax = upper)) +
+  coord_flip() +
+  geom_hline(aes(yintercept = 0.92), col = "red", size = 1) +
+  labs(x = "Test Set ID", y = "Accuracy")
+```
 
 ## Motivation
 
