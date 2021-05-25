@@ -160,7 +160,7 @@ For different metrics $n$ has different values:
 
 This can all be done with a very simple python function:
 
-```
+```python
 def hoeffding_interval(n, delta, estimate):
     epsilon = math.sqrt((math.log(2 / delta)) / (2 * n))
     return (max(estimate - epsilon, 0), min(estimate + epsilon, 1))
@@ -168,7 +168,7 @@ def hoeffding_interval(n, delta, estimate):
 
 For example if my estimate $\hat{\theta}_n=0.8$ then:
 
-```
+```python
 >>> import math
 >>> hoeffding_interval(100, 0.05, 0.8)
 (0.6641898484259381, 0.935810151574062)
